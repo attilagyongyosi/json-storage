@@ -48,7 +48,9 @@ public class JSONStore<T> implements Store {
         data = new HashMap<>();
         try {
             final String fileContents = new String(Files.readAllBytes(filePath), StandardCharsets.UTF_8);
-            data = MAPPER.readValue(fileContents, new TypeReference<Map<String, T>>(){});
+            if (fileContents != null && !fileContents.isEmpty()) {
+                data = MAPPER.readValue(fileContents, new TypeReference<Map<String, T>>(){});
+            }
         } catch (IOException e) {
             e.printStackTrace();        // TODO: custom exception
             System.exit(3);
