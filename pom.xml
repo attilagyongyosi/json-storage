@@ -24,18 +24,36 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.java>1.8</version.java>
+
+        <version.dependency.logback>1.1.7</version.dependency.logback>
+        <version.dependency.slf4j>1.7.21</version.dependency.slf4j>
+
         <version.dependency.junit>4.12</version.dependency.junit>
+
         <version.dependency.jackson>2.8.3</version.dependency.jackson>
+
         <version.plugin.compiler>3.5.1</version.plugin.compiler>
         <version.plugin.surefire>2.19.1</version.plugin.surefire>
     </properties>
 
     <dependencies>
         <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${version.dependency.logback}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${version.dependency.slf4j}</version>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${version.dependency.junit}</version>
         </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>

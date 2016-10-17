@@ -1,16 +1,19 @@
 package com.attilagyongyosi.lib.jsonstorage.store.impl;
 
+import com.attilagyongyosi.lib.jsonstorage.exceptions.StoreCreationException;
 import com.attilagyongyosi.lib.jsonstorage.store.Store;
+import com.attilagyongyosi.lib.jsonstorage.utils.FileUtils;
+import com.attilagyongyosi.lib.jsonstorage.utils.StringUtils;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,42 +21,51 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JSONStore<T> implements Store {
+    private static final Logger LOG = LoggerFactory.getLogger(JSONStore.class);
+
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private BufferedWriter writer;
-    private BufferedReader reader;
     private Map<String, T> data;
 
     @Override
-    public void create(final String fileName) {
-        Path filePath = Paths.get(fileName);
+    public void create(final String fileName) throws StoreCreationException {
+        LOG.debug("Creating JSON store in file {}..", fileName);
 
-        if (Files.notExists(filePath)) {
-            try {
-                Files.createFile(filePath);
-            } catch (IOException e) {
-                e.printStackTrace();    // TODO: custom exception
-                System.exit(1);
-            }
-        }
+        final Path filePath = Paths.get(fileName);
+        createStoreFileIfNotExists(filePath);
 
         try {
             writer = new BufferedWriter(new PrintWriter(fileName));
-            reader = new BufferedReader(new FileReader(fileName));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();        // TODO: custom exception
-            System.exit(2);
+        } catch (final FileNotFoundException fnfe) {
+            LOG.error("File {} not found while trying to create writer!", fileName);
+            throw new StoreCreationException("File not found!", fnfe);
         }
 
         data = new HashMap<>();
+
         try {
-            final String fileContents = new String(Files.readAllBytes(filePath), StandardCharsets.UTF_8);
-            if (fileContents != null && !fileContents.isEmpty()) {
-                data = MAPPER.readValue(fileContents, new TypeReference<Map<String, T>>(){});
+            final String fileContents = FileUtils.readContents(filePath);
+            if (!StringUtils.isEmpty(fileContents)) {
+                data = MAPPER.readValue(fileContents, new TypeReference<Map<String, T>>() {});
             }
-        } catch (IOException e) {
-            e.printStackTrace();        // TODO: custom exception
-            System.exit(3);
+        } catch (final JsonParseException jpe) {
+            LOG.error("Could not parse file contents as JSON!", jpe);
+            throw new StoreCreationException(jpe);
+        } catch (final IOException ioe) {
+            LOG.error("Error while reading file {} as JSON!", fileName, ioe);
+            throw new StoreCreationException(ioe);
+        }
+    }
+
+    private void createStoreFileIfNotExists(final Path filePath) throws StoreCreationException {
+        if (Files.notExists(filePath)) {
+            try {
+                Files.createFile(filePath);
+            } catch (final IOException ioe) {
+                LOG.error("Could not create store file at {}!", filePath);
+                throw new StoreCreationException("Could not create store file!", ioe);
+            }
         }
     }
 }
