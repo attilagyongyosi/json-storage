@@ -1,5 +1,6 @@
 package com.attilagyongyosi.lib.jsonstorage.store.impl;
 
+import com.attilagyongyosi.lib.jsonstorage.exceptions.StorageException;
 import com.attilagyongyosi.lib.jsonstorage.exceptions.StoreCreationException;
 import com.attilagyongyosi.lib.jsonstorage.store.Store;
 import com.attilagyongyosi.lib.jsonstorage.utils.FileUtils;
@@ -20,19 +21,20 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JSONStore<T> implements Store {
+public class JSONStore implements Store<Object> {
     private static final Logger LOG = LoggerFactory.getLogger(JSONStore.class);
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
+    private Path filePath;
     private BufferedWriter writer;
-    private Map<String, T> data;
+    private Map<String, Object> data;
 
     @Override
     public void create(final String fileName) throws StoreCreationException {
         LOG.debug("Creating JSON store in file {}..", fileName);
 
-        final Path filePath = Paths.get(fileName);
+        filePath = Paths.get(fileName);
         createStoreFileIfNotExists(filePath);
 
         try {
@@ -47,7 +49,7 @@ public class JSONStore<T> implements Store {
         try {
             final String fileContents = FileUtils.readContents(filePath);
             if (!StringUtils.isEmpty(fileContents)) {
-                data = MAPPER.readValue(fileContents, new TypeReference<Map<String, T>>() {});
+                data = MAPPER.readValue(fileContents, new TypeReference<Map<String, Object>>() {});
             }
         } catch (final JsonParseException jpe) {
             LOG.error("Could not parse file contents as JSON!", jpe);
@@ -56,6 +58,19 @@ public class JSONStore<T> implements Store {
             LOG.error("Error while reading file {} as JSON!", fileName, ioe);
             throw new StoreCreationException(ioe);
         }
+    }
+
+    @Override
+    public Object store(final String key, final Object object) throws StorageException {
+        try {
+            data.put(key, object);
+            MAPPER.writeValue(writer, data);
+        } catch (final IOException ioe) {
+            LOG.error("Error while writing to file {}!", filePath);
+            throw new StorageException(ioe);
+        }
+
+        return object;
     }
 
     private void createStoreFileIfNotExists(final Path filePath) throws StoreCreationException {
@@ -68,4 +83,6 @@ public class JSONStore<T> implements Store {
             }
         }
     }
+
+
 }
