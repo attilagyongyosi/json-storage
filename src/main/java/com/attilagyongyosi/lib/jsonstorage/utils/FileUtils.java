@@ -10,5 +10,9 @@ public final class FileUtils {
         return new String(Files.readAllBytes(filePath), StandardCharsets.UTF_8);
     }
 
+    public static Path createIfNotExists(final Path path) throws IOException {
+        return Files.notExists(path) ? Files.createFile(path) : path;
+    }
+
     private FileUtils() {}
 }

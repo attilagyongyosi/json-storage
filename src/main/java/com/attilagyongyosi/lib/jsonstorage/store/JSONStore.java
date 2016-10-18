@@ -36,7 +36,7 @@ public class JSONStore<T> {
 
     public JSONStore<T> create() throws StoreCreationException {
         LOG.debug("Creating JSON store in file {}..", this.filePath);
-        createStoreFileIfNotExists(this.filePath);
+        createStoreFileIfNotExists();
 
         try {
             this.writer = new BufferedWriter(new PrintWriter(this.filePath.toFile()));
@@ -94,14 +94,12 @@ public class JSONStore<T> {
         }
     }
 
-    private void createStoreFileIfNotExists(final Path filePath) throws StoreCreationException {
-        if (Files.notExists(filePath)) {
-            try {
-                Files.createFile(filePath);
-            } catch (final IOException ioe) {
-                LOG.error("Could not create store file at {}!", filePath, ioe);
-                throw new StoreCreationException("Could not create store file!", ioe);
-            }
+    private void createStoreFileIfNotExists() throws StoreCreationException {
+        try {
+            this.filePath = FileUtils.createIfNotExists(this.filePath);
+        } catch (final IOException ioe) {
+            LOG.error("Could not create store file at {}!", this.filePath, ioe);
+            throw new StoreCreationException("Could not create store file!", ioe);
         }
     }
 
