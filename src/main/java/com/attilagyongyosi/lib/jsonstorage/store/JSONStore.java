@@ -13,8 +13,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +39,7 @@ public class JSONStore<T> {
         createStoreFileIfNotExists();
 
         try {
-            this.writer = Files.newBufferedWriter(this.filePath);
+            this.writer = Files.newBufferedWriter(this.filePath, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
         } catch (final IOException ioe) {
             LOG.error("Could not create writer to file {}!", this.filePath);
             throw new StoreCreationException("File not found!", ioe);

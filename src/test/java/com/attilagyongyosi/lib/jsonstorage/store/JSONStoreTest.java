@@ -15,6 +15,7 @@ import java.util.Collection;
 public class JSONStoreTest {
     private static final String LOCAL_DB_NAME = "local-db.db";
     private static final String LOCAL_DB_OUTSIDE_PROJECT_NAME = "../local-db-outside.db";
+    private static final String EXISTING_DB_NAME = "db/existing-test-db.db";
 
     private static final TestModel MODEL1 = TestModel.builder()
         .id(1)
@@ -90,6 +91,30 @@ public class JSONStoreTest {
         Assert.assertEquals(2, stored.size());
         Assert.assertTrue(stored.contains(MODEL1));
         Assert.assertTrue(stored.contains(MODEL2));
+    }
+
+    @Test
+    public void canOpenExistingDB() throws StoreCreationException {
+        final TestModel expected = TestModel.builder()
+            .id(1)
+            .active(true)
+            .property("existing")
+            .property("test")
+            .relative(TestModel.builder()
+                .id(2)
+                .active(false)
+                .property("funky")
+                .property("town")
+                .build())
+            .build();
+
+        JSONStore<TestModel> existingStore = JSONStoreBuilder.<TestModel>builder()
+                .path(EXISTING_DB_NAME)
+                .build();
+
+        Collection<TestModel> stored = existingStore.retrieveAll();
+        Assert.assertEquals(1, stored.size());
+        Assert.assertEquals(expected, existingStore.retrieve("1"));
     }
 
     @Test
