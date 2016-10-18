@@ -22,7 +22,13 @@ public class JSONStoreTest {
     }
 
     private void createStoreAndCheck(final String fileName) throws StoreCreationException {
-        JSONStoreBuilder.builder().path(fileName).build();
+        JSONStore<String> store = JSONStoreBuilder
+            .builder()
+            .path(fileName)
+            .build();
+
         Assert.assertTrue(Files.exists(Paths.get(fileName)));
+
+        store.destroy();
     }
 }

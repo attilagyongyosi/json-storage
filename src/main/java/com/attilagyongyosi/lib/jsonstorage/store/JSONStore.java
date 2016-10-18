@@ -36,43 +36,57 @@ public class JSONStore<T> {
         return this.filePath;
     }
 
-    public void create() throws StoreCreationException {
-        LOG.debug("Creating JSON store in file {}..", filePath);
-        createStoreFileIfNotExists(filePath);
+    public JSONStore<T> create() throws StoreCreationException {
+        LOG.debug("Creating JSON store in file {}..", this.filePath);
+        createStoreFileIfNotExists(this.filePath);
 
         try {
-            writer = new BufferedWriter(new PrintWriter(filePath.toFile()));
+            this.writer = new BufferedWriter(new PrintWriter(this.filePath.toFile()));
         } catch (final FileNotFoundException fnfe) {
-            LOG.error("File {} not found while trying to create writer!", filePath);
+            LOG.error("File {} not found while trying to create writer!", this.filePath);
             throw new StoreCreationException("File not found!", fnfe);
         }
 
-        data = new HashMap<>();
+        this.data = new HashMap<>();
 
         try {
-            final String fileContents = FileUtils.readContents(filePath);
+            final String fileContents = FileUtils.readContents(this.filePath);
             if (!StringUtils.isEmpty(fileContents)) {
-                data = MAPPER.readValue(fileContents, new TypeReference<Map<String, T>>() { });
+                this.data = MAPPER.readValue(fileContents, new TypeReference<Map<String, T>>() { });
             }
         } catch (final JsonParseException jpe) {
             LOG.error("Could not parse file contents as JSON!", jpe);
             throw new StoreCreationException(jpe);
         } catch (final IOException ioe) {
-            LOG.error("Error while reading file {} as JSON!", filePath, ioe);
+            LOG.error("Error while reading file {} as JSON!", this.filePath, ioe);
             throw new StoreCreationException(ioe);
         }
+
+        return this;
     }
 
     public T store(final String key, final T object) throws StorageException {
         try {
-            data.put(key, object);
-            MAPPER.writeValue(writer, data);
+            this.data.put(key, object);
+            MAPPER.writeValue(this.writer, this.data);
         } catch (final IOException ioe) {
-            LOG.error("Error while writing to file {}!", filePath, ioe);
+            LOG.error("Error while writing to file {}!", this.filePath, ioe);
             throw new StorageException(ioe);
         }
 
         return object;
+    }
+
+    public boolean destroy() {
+        LOG.debug("Destroying JSON store at {}...", this.filePath);
+        try {
+            writer.flush();
+            writer.close();
+            return Files.deleteIfExists(filePath);
+        } catch (final IOException ioe) {
+            LOG.error("Could not destroy JSON storage at {}!", filePath, ioe);
+            return false;
+        }
     }
 
     private void createStoreFileIfNotExists(final Path filePath) throws StoreCreationException {

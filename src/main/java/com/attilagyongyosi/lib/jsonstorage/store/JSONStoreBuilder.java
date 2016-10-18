@@ -1,5 +1,7 @@
 package com.attilagyongyosi.lib.jsonstorage.store;
 
+import com.attilagyongyosi.lib.jsonstorage.exceptions.StoreCreationException;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -11,7 +13,7 @@ public final class JSONStoreBuilder<T> {
     }
 
     public JSONStoreBuilder() {
-        this.jsonStore = new JSONStore();
+        this.jsonStore = new JSONStore<>();
     }
 
     public JSONStoreBuilder<T> path(final String pathAsString) {
@@ -20,7 +22,7 @@ public final class JSONStoreBuilder<T> {
         return this;
     }
 
-    public JSONStore<T> build() {
-        return this.jsonStore;
+    public JSONStore<T> build() throws StoreCreationException {
+        return this.jsonStore.create();
     }
 }
