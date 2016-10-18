@@ -87,6 +87,13 @@ public class JSONStoreTest {
         Assert.assertTrue(stored.contains(MODEL2));
     }
 
+    @Test
+    public void canClear() throws StorageException {
+        store.clear();
+        final Collection<TestModel> stored = store.retrieveAll();
+        Assert.assertEquals(0, stored.size());
+    }
+
     @After
     public void tearDown() {
         store.destroy();
