@@ -30,6 +30,7 @@
         <version.dependency.slf4j>1.7.21</version.dependency.slf4j>
 
         <version.dependency.junit>4.12</version.dependency.junit>
+        <version.dependency.lombok>1.16.10</version.dependency.lombok>
 
         <version.dependency.jackson>2.8.3</version.dependency.jackson>
 
@@ -57,6 +58,13 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${version.dependency.junit}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${version.dependency.lombok}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
