@@ -221,6 +221,28 @@
                                 </execution>
                             </executions>
                         </plugin>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>cobertura-maven-plugin</artifactId>
+                            <configuration>
+                                <check>
+                                    <haltOnFailure>true</haltOnFailure>
+                                    <lineRate>80</lineRate>
+                                    <branchRate>80</branchRate>
+                                    <totalBranchRate>80</totalBranchRate>
+                                    <totalLineRate>80</totalLineRate>
+                                </check>
+                            </configuration>
+                            <executions>
+                                <execution>
+                                    <phase>post-integration-test</phase>
+                                    <goals>
+                                        <goal>cobertura</goal>
+                                        <goal>check</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
                     </plugins>
                 </pluginManagement>
             </build>
