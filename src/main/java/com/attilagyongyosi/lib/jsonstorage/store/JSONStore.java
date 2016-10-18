@@ -12,9 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -39,10 +37,10 @@ public class JSONStore<T> {
         createStoreFileIfNotExists();
 
         try {
-            this.writer = new BufferedWriter(new PrintWriter(this.filePath.toFile()));
-        } catch (final FileNotFoundException fnfe) {
-            LOG.error("File {} not found while trying to create writer!", this.filePath);
-            throw new StoreCreationException("File not found!", fnfe);
+            this.writer = Files.newBufferedWriter(this.filePath);
+        } catch (final IOException ioe) {
+            LOG.error("Could not create writer to file {}!", this.filePath);
+            throw new StoreCreationException("File not found!", ioe);
         }
 
         this.data = new HashMap<>();

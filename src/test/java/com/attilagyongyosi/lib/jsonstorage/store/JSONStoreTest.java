@@ -60,6 +60,11 @@ public class JSONStoreTest {
         createStoreAndCheck(LOCAL_DB_OUTSIDE_PROJECT_NAME);
     }
 
+    @Test(expected = StoreCreationException.class)
+    public void throwsErrorWhenCreatingWithInvalidName() throws StoreCreationException {
+        createStoreAndCheck("test?-db.db");
+    }
+
     @Test
     public void canStore() throws StorageException {
         final TestModel toBeStored = TestModel.builder()

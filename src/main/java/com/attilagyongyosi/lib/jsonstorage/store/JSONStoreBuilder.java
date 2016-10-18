@@ -2,6 +2,7 @@ package com.attilagyongyosi.lib.jsonstorage.store;
 
 import com.attilagyongyosi.lib.jsonstorage.exceptions.StoreCreationException;
 
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -16,9 +17,14 @@ public final class JSONStoreBuilder<T> {
         this.jsonStore = new JSONStore<>();
     }
 
-    public JSONStoreBuilder<T> path(final String pathAsString) {
-        final Path path = Paths.get(pathAsString);
-        this.jsonStore.setFilePath(path);
+    public JSONStoreBuilder<T> path(final String pathAsString) throws StoreCreationException {
+        try {
+            final Path path = Paths.get(pathAsString);
+            this.jsonStore.setFilePath(path);
+        } catch (final InvalidPathException ipe) {
+            throw new StoreCreationException("Invalid path for store " + pathAsString + "!", ipe);
+        }
+
         return this;
     }
 
