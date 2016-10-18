@@ -4,6 +4,8 @@ import com.attilagyongyosi.lib.jsonstorage.exceptions.StorageException;
 import com.attilagyongyosi.lib.jsonstorage.exceptions.StoreCreationException;
 import com.attilagyongyosi.lib.jsonstorage.utils.FileUtils;
 import com.attilagyongyosi.lib.jsonstorage.utils.StringUtils;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,24 +18,27 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 public class JSONStore<T> {
     private static final Logger LOG = LoggerFactory.getLogger(JSONStore.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER;
 
     private Path filePath;
     private BufferedWriter writer;
     private Map<String, T> data;
 
-    public void setFilePath(final Path filePath) {
-        this.filePath = filePath;
+    static {
+        JsonFactory jsonFactory = new JsonFactory();
+        jsonFactory.disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET);
+        MAPPER = new ObjectMapper(jsonFactory);
     }
 
-    public Path getFilePath() {
-        return this.filePath;
+    public void setFilePath(final Path filePath) {
+        this.filePath = filePath;
     }
 
     public JSONStore<T> create() throws StoreCreationException {
@@ -66,21 +71,28 @@ public class JSONStore<T> {
     }
 
     public T store(final String key, final T object) throws StorageException {
-        try {
-            this.data.put(key, object);
-            MAPPER.writeValue(this.writer, this.data);
-        } catch (final IOException ioe) {
-            LOG.error("Error while writing to file {}!", this.filePath, ioe);
-            throw new StorageException(ioe);
-        }
-
+        this.data.put(key, object);
+        this.sync();
         return object;
+    }
+
+    public Collection<T> retrieveAll() {
+        return this.data.values();
+    }
+
+    public T retrieve(final String key) {
+        return this.data.get(key);
+    }
+
+    public boolean clear() throws StorageException {
+        this.data.clear();
+        this.sync();
+        return true;
     }
 
     public boolean destroy() {
         LOG.debug("Destroying JSON store at {}...", this.filePath);
         try {
-            writer.flush();
             writer.close();
             return Files.deleteIfExists(filePath);
         } catch (final IOException ioe) {
@@ -100,5 +112,13 @@ public class JSONStore<T> {
         }
     }
 
+    private void sync() throws StorageException {
+        try {
+            MAPPER.writeValue(this.writer, this.data);
+        } catch (final IOException ioe) {
+            LOG.error("Error while syncing to file {}!", this.filePath, ioe);
+            throw new StorageException(ioe);
+        }
+    }
 
 }
