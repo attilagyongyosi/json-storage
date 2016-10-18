@@ -3,9 +3,8 @@ package com.attilagyongyosi.lib.jsonstorage.store;
 import com.attilagyongyosi.lib.jsonstorage.exceptions.StorageException;
 import com.attilagyongyosi.lib.jsonstorage.exceptions.StoreCreationException;
 import com.attilagyongyosi.lib.jsonstorage.utils.FileUtils;
+import com.attilagyongyosi.lib.jsonstorage.utils.JSONUtils;
 import com.attilagyongyosi.lib.jsonstorage.utils.StringUtils;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,17 +24,11 @@ import java.util.Map;
 public class JSONStore<T> {
     private static final Logger LOG = LoggerFactory.getLogger(JSONStore.class);
 
-    private static final ObjectMapper MAPPER;
+    private static final ObjectMapper MAPPER = JSONUtils.getMapper();
 
     private Path filePath;
     private BufferedWriter writer;
     private Map<String, T> data;
-
-    static {
-        JsonFactory jsonFactory = new JsonFactory();
-        jsonFactory.disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET);
-        MAPPER = new ObjectMapper(jsonFactory);
-    }
 
     public void setFilePath(final Path filePath) {
         this.filePath = filePath;
