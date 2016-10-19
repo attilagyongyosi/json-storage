@@ -1,5 +1,6 @@
 package com.attilagyongyosi.lib.jsonstorage.store;
 
+import com.attilagyongyosi.lib.jsonstorage.TestData;
 import com.attilagyongyosi.lib.jsonstorage.domain.TestModel;
 import com.attilagyongyosi.lib.jsonstorage.exceptions.StorageException;
 import com.attilagyongyosi.lib.jsonstorage.exceptions.StoreCreationException;
@@ -20,35 +21,6 @@ public class JSONStoreTest {
     private static final String LOCAL_DB_OUTSIDE_PROJECT_NAME = "../local-db-outside.db";
     private static final String EXISTING_DB_NAME = "db/test/valid-db.db";
 
-    private static final TestModel MODEL1 = TestModel.builder()
-        .id(1)
-        .active(false)
-        .property("nice")
-        .property("cosy")
-        .property("model")
-        .relative(TestModel.builder()
-            .id(2)
-            .active(true)
-            .property("funk")
-            .build())
-        .relative(TestModel.builder()
-            .id(3)
-            .active(true)
-            .build())
-        .build();
-
-    private static final TestModel MODEL2 = TestModel.builder()
-        .id(4)
-        .active(true)
-        .property("small")
-        .property("big")
-        .relative(TestModel.builder()
-            .id(5)
-            .active(false)
-            .property("warm")
-            .build())
-        .build();
-
     private FileLock lock;
 
     private JSONStore<TestModel> store;
@@ -56,8 +28,8 @@ public class JSONStoreTest {
     @Before
     public void setUp() throws Exception {
         store = JSONStoreBuilder.builder().path(LOCAL_DB_NAME).build(TestModel.class);
-        store.store("test1", MODEL1);
-        store.store("test2", MODEL2);
+        store.store("test1", TestData.MODEL1);
+        store.store("test2", TestData.MODEL2);
     }
 
     @Test
@@ -86,15 +58,15 @@ public class JSONStoreTest {
     @Test
     public void canRetrieve() throws Exception {
         final TestModel stored = store.retrieve("test1");
-        Assert.assertEquals(MODEL1, stored);
+        Assert.assertEquals(TestData.MODEL1, stored);
     }
 
     @Test
     public void canRetrieveAll() throws Exception {
         final Collection<TestModel> stored = store.retrieveAll();
         Assert.assertEquals(2, stored.size());
-        Assert.assertTrue(stored.contains(MODEL1));
-        Assert.assertTrue(stored.contains(MODEL2));
+        Assert.assertTrue(stored.contains(TestData.MODEL1));
+        Assert.assertTrue(stored.contains(TestData.MODEL2));
     }
 
     @Test
