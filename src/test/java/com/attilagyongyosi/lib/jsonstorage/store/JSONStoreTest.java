@@ -8,6 +8,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -16,7 +19,6 @@ public class JSONStoreTest {
     private static final String LOCAL_DB_NAME = "local-db.db";
     private static final String LOCAL_DB_OUTSIDE_PROJECT_NAME = "../local-db-outside.db";
     private static final String EXISTING_DB_NAME = "db/test/valid-db.db";
-    private static final String EXISTING_INVALID_DB_NAME = "db/test/invalid-db.db";
 
     private static final TestModel MODEL1 = TestModel.builder()
         .id(1)
@@ -47,28 +49,29 @@ public class JSONStoreTest {
             .build())
         .build();
 
+    private FileLock lock;
 
     private JSONStore<TestModel> store;
 
     @Before
-    public void setUp() throws StoreCreationException, StorageException {
+    public void setUp() throws Exception {
         store = JSONStoreBuilder.builder().path(LOCAL_DB_NAME).build(TestModel.class);
         store.store("test1", MODEL1);
         store.store("test2", MODEL2);
     }
 
     @Test
-    public void canCreateStoreAnywhere() throws StoreCreationException {
+    public void canCreateStoreAnywhere() throws Exception {
         createStoreAndCheck(LOCAL_DB_OUTSIDE_PROJECT_NAME);
     }
 
     @Test(expected = StoreCreationException.class)
-    public void throwsErrorWhenCreatingWithInvalidName() throws StoreCreationException {
+    public void throwsErrorWhenCreatingWithInvalidName() throws Exception {
         createStoreAndCheck("test?-db.db");
     }
 
     @Test
-    public void canStore() throws StorageException {
+    public void canStore() throws Exception {
         final TestModel toBeStored = TestModel.builder()
             .id(11)
             .active(true)
@@ -81,13 +84,13 @@ public class JSONStoreTest {
     }
 
     @Test
-    public void canRetrieve() throws StorageException {
+    public void canRetrieve() throws Exception {
         final TestModel stored = store.retrieve("test1");
         Assert.assertEquals(MODEL1, stored);
     }
 
     @Test
-    public void canRetrieveAll() throws StorageException {
+    public void canRetrieveAll() throws Exception {
         final Collection<TestModel> stored = store.retrieveAll();
         Assert.assertEquals(2, stored.size());
         Assert.assertTrue(stored.contains(MODEL1));
@@ -95,7 +98,7 @@ public class JSONStoreTest {
     }
 
     @Test
-    public void canOpenExistingDB() throws StoreCreationException {
+    public void canOpenExistingDB() throws Exception {
         final TestModel expected = TestModel.builder()
             .id(1)
             .active(true)
@@ -121,19 +124,52 @@ public class JSONStoreTest {
     @Test(expected = StoreCreationException.class)
     public void failsWhenOpeningInvalidDb() throws StoreCreationException {
         JSONStoreBuilder.<TestModel>builder()
-            .path(EXISTING_INVALID_DB_NAME)
+            .path("db/test/invalid-db.db")
             .build(TestModel.class);
     }
 
+    @Test(expected = StoreCreationException.class)
+    public void failsWhenOpeningUnmappableDb() throws StoreCreationException {
+        JSONStoreBuilder.<TestModel>builder()
+                .path("db/test/valid-unmappable-db.db")
+                .build(TestModel.class);
+    }
+
+    @Test(expected = StoreCreationException.class)
+    public void createFailsWhenStoreCanNotBeAccessed() throws StoreCreationException, IOException {
+        RandomAccessFile randomAccessFile = new RandomAccessFile(EXISTING_DB_NAME, "rw");
+        lock = randomAccessFile.getChannel().lock();
+
+        JSONStoreBuilder.<TestModel>builder()
+                .path(EXISTING_DB_NAME)
+                .build(TestModel.class);
+    }
+
+    @Test(expected = StorageException.class)
+    public void clearFailsWhenStoreCanNotBeAccessed() throws StoreCreationException, StorageException, IOException {
+        JSONStore<TestModel> store = JSONStoreBuilder.<TestModel>builder()
+                .path(EXISTING_DB_NAME)
+                .build(TestModel.class);
+
+        RandomAccessFile randomAccessFile = new RandomAccessFile(EXISTING_DB_NAME, "rw");
+        lock = randomAccessFile.getChannel().lock();
+
+        store.clear();
+    }
+
     @Test
-    public void canClear() throws StorageException {
+    public void canClear() throws Exception {
         store.clear();
         final Collection<TestModel> stored = store.retrieveAll();
         Assert.assertEquals(0, stored.size());
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws IOException {
+        if (lock != null) {
+            lock.release();
+        }
+
         store.destroy();
     }
 

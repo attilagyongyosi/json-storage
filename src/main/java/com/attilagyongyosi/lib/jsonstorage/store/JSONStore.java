@@ -6,6 +6,7 @@ import com.attilagyongyosi.lib.jsonstorage.utils.FileUtils;
 import com.attilagyongyosi.lib.jsonstorage.utils.JSONUtils;
 import com.attilagyongyosi.lib.jsonstorage.utils.StringUtils;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.slf4j.Logger;
@@ -53,11 +54,11 @@ public class JSONStore<T> {
                 TypeFactory typeFactory = TypeFactory.defaultInstance();
                 this.data = MAPPER.readValue(fileContents, typeFactory.constructMapType(Map.class, String.class, type));
             }
-        } catch (final JsonParseException jpe) {
-            LOG.error("Could not parse file contents as JSON!", jpe);
-            throw new StoreCreationException(jpe);
+        } catch (final JsonMappingException | JsonParseException je) {
+            LOG.error("Could not parse file contents as JSON!", je);
+            throw new StoreCreationException(je);
         } catch (final IOException ioe) {
-            LOG.error("Error while reading file {} as JSON!", this.filePath, ioe);
+            LOG.error("Could not parse file contents as JSON!", ioe);
             throw new StoreCreationException(ioe);
         }
 
