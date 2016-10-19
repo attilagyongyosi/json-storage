@@ -1,0 +1,16 @@
+{
+    "1": {
+        "id": 1,
+        "active": true,
+        "properties": [
+            "existing",
+            "test"
+        ],
+        "relatives": [{
+            "id": 2,
+            "active": false,
+            "properties": ["funky", "town"],
+            "relatives": []
+        }]
+    }
+}

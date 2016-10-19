@@ -6,8 +6,8 @@ import com.attilagyongyosi.lib.jsonstorage.utils.FileUtils;
 import com.attilagyongyosi.lib.jsonstorage.utils.JSONUtils;
 import com.attilagyongyosi.lib.jsonstorage.utils.StringUtils;
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class JSONStore<T> {
         this.filePath = filePath;
     }
 
-    public JSONStore<T> create() throws StoreCreationException {
+    public JSONStore<T> create(final Class<T> type) throws StoreCreationException {
         LOG.debug("Creating JSON store in file {}..", this.filePath);
         createStoreFileIfNotExists();
 
@@ -50,7 +50,8 @@ public class JSONStore<T> {
         try {
             final String fileContents = FileUtils.readContents(this.filePath);
             if (!StringUtils.isEmpty(fileContents)) {
-                this.data = MAPPER.readValue(fileContents, new TypeReference<Map<String, T>>() { });
+                TypeFactory typeFactory = TypeFactory.defaultInstance();
+                this.data = MAPPER.readValue(fileContents, typeFactory.constructMapType(Map.class, String.class, type));
             }
         } catch (final JsonParseException jpe) {
             LOG.error("Could not parse file contents as JSON!", jpe);

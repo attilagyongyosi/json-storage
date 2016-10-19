@@ -28,7 +28,7 @@ public final class JSONStoreBuilder<T> {
         return this;
     }
 
-    public JSONStore<T> build() throws StoreCreationException {
-        return this.jsonStore.create();
+    public JSONStore<T> build(final Class<T> type) throws StoreCreationException {
+        return this.jsonStore.create(type);
     }
 }

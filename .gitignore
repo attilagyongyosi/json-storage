@@ -6,3 +6,5 @@ bin/
 build/
 *.db
 db
+!db/test
+!db/test/*.db
