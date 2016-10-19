@@ -80,6 +80,7 @@ public class JSONStore<T> {
     }
 
     public boolean clear() throws StorageException {
+        LOG.debug("Clearing JSON storage at {}...", this.filePath);
         this.data.clear();
         this.sync();
         return true;

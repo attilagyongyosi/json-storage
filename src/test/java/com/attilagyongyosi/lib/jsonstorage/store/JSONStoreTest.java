@@ -141,8 +141,8 @@ public class JSONStoreTest {
         lock = randomAccessFile.getChannel().lock();
 
         JSONStoreBuilder.<TestModel>builder()
-                .path(EXISTING_DB_NAME)
-                .build(TestModel.class);
+            .path(EXISTING_DB_NAME)
+            .build(TestModel.class);
     }
 
     @Test(expected = StorageException.class)
