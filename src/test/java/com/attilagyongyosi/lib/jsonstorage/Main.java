@@ -12,6 +12,7 @@ public class Main {
                 .path("testy")
                 .build(TestModel.class);
 
+        store.clear();
         store.store("test1", TestData.MODEL1);
         store.store("test2", TestData.MODEL1);
     }

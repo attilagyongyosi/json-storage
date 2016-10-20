@@ -123,10 +123,12 @@ public class JSONStore<T> {
     }
 
     private void readStoreContents(final Class<T> type) throws StoreCreationException {
-        this.data = new HashMap<>();
         try {
             JavaType dataType = TypeFactory.defaultInstance().constructMapType(Map.class, String.class, type);
             this.data = JSONUtils.parse(this.filePath, dataType);
+            if (this.data == null) {
+                this.data = new HashMap<>();
+            }
         } catch (final IOException | InvalidJsonException e) {
             LOG.error("Could not parse file contents as JSON!", e);
             throw new StoreCreationException(e);
