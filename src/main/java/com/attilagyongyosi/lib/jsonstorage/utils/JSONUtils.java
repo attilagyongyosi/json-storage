@@ -42,6 +42,23 @@ public final class JSONUtils {
         return MAPPER;
     }
 
+    /**
+     * Deserializes the contents of a file into a given Java type.
+     *
+     * @param file
+     *      the file to deserialize
+     *
+     * @param type
+     *      an instance of Jackson's {@link JavaType}, denoting the Java type to deserialize file contents.
+     *
+     * @param <T>
+     *     static type parameter defining return type.
+     *
+     * @return an instance of the type T, the result of the deserialization.
+     *
+     * @throws InvalidJsonException
+     * @throws IOException
+     */
     public static <T> T parse(final Path file, final JavaType type) throws InvalidJsonException, IOException {
         try {
             final String fileContents = FileUtils.readContents(file);
