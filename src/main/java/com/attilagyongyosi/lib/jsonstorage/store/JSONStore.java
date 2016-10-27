@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * {@code JSONStore} is an easy way to persist a collection of objects
+ * {@link JSONStore} is an easy way to persist a collection of objects
  * in a JSON file.
  *
  * JSONStore is essentially a {@link Map} instance which automatically gets
@@ -33,7 +33,7 @@ import java.util.Map;
  * @param <T>
  *     Type of the objects you want to store in the backing JSON file.
  *
- * @author Attila_Gyongyosi
+ * @author attilagyongyosi
  */
 public class JSONStore<T> {
     private static final Logger LOG = LoggerFactory.getLogger(JSONStore.class);
@@ -63,6 +63,22 @@ public class JSONStore<T> {
         this.filePath = filePath;
     }
 
+    /**
+     * Creates a new {@link JSONStore} instance.
+     *
+     * This method acts as a special constructor and will create a new file on the disk at the
+     * path denoted by {@code filePath} if it does not yet exist.
+     *
+     * Then the file's contents will be read and deserialized into the backing {@link Map} instance.
+     *
+     * @param type
+     *      the type of objects this JSON store will contain.
+     *
+     * @return itself
+     *
+     * @throws StoreCreationException
+     *      when there is an issue during the creation and initialization of the store
+     */
     public JSONStore<T> create(final Class<T> type) throws StoreCreationException {
         LOG.debug("Creating JSON store in file {}...", this.filePath);
         createStoreFileIfNotExists();
@@ -71,6 +87,20 @@ public class JSONStore<T> {
         return this;
     }
 
+    /**
+     * Stores an object in the JSON store.
+     *
+     * @param key
+     *      the String key where the object should be stored.
+     *
+     * @param object
+     *      the object itself to store as JSON.
+     *
+     * @return the stored object if operation was successful
+     *
+     * @throws StorageException
+     *      when an error occurs during the storage operation
+     */
     public T store(final String key, final T object) throws StorageException {
         LOG.debug("Storing {} as key {}...", object, key);
         this.data.put(key, object);
@@ -78,14 +108,47 @@ public class JSONStore<T> {
         return object;
     }
 
+    /**
+     * Returns all stored object.
+     *
+     * This method will not actually fetch data from the backing JSON file,
+     * it will simply return the values stored in the {@code Map}.
+     *
+     * This is to avoid unnecessary file read operations as the Map should
+     * always be in sync with the backing file.
+     *
+     * @return a collection of objects currently stored in the storage.
+     */
     public Collection<T> retrieveAll() {
         return this.data.values();
     }
 
+    /**
+     * Returns a single object from the store, specified by the supplied key.
+     *
+     * This method will not actually fetch data from the backing JSON file,
+     * it will simply return the values stored in the {@link Map}.
+     *
+     * This is to avoid unnecessary file read operations as the Map should
+     * always be in sync with the backing file.
+     *
+     * @param key
+     *      the key to retrieve the stored object from
+     *
+     * @return the object contained at the supplied key or {@code null}.
+     */
     public T retrieve(final String key) {
         return this.data.get(key);
     }
 
+    /**
+     * Clears both the underlying {@link Map} instance and the backing
+     * JSON file.
+     *
+     * @return {@code true} if the operation was successful, {@code false} otherwise.
+     *
+     * @throws StorageException when operation fails
+     */
     public boolean clear() throws StorageException {
         LOG.debug("Clearing JSON storage at {}...", this.filePath);
         this.data.clear();
@@ -93,6 +156,13 @@ public class JSONStore<T> {
         return true;
     }
 
+    /**
+     * Destroys the current JSON storage.
+     *
+     * It will close opened resources and will delete the backing JSON file.
+     *
+     * @return {@code true} if the operation was successful, {@code false} otherwise.
+     */
     public boolean destroy() {
         LOG.debug("Destroying JSON store at {}...", this.filePath);
         try {

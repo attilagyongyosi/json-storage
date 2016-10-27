@@ -6,6 +6,14 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Class implementing a Builder pattern for a {@link JSONStore} instance.
+ *
+ * @param <T>
+ *     the type of object the resulting {@link JSONStore} should contain.
+ *
+ * @author attilagyongyosi
+ */
 public final class JSONStoreBuilder<T> {
     private final JSONStore<T> jsonStore;
 
