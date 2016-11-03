@@ -20,8 +20,8 @@ public final class FileUtils {
      * Reads the contents of the file specified by the given {@link Path} instance.
      * Resulting {@code String} will be UTF-8 encoded.
      *
-     * @param filePath
-     *      a {@link Path} instance containing the absolute path of the file to read.
+     * @param  filePath
+     *         a {@link Path} instance containing the absolute path of the file to read.
      *
      * @return an UTF-8 encoded {@code String} containing the file's contents.
      *
@@ -34,8 +34,8 @@ public final class FileUtils {
     /**
      * Creates a new file at the path denoted by {@code path} if it doesn't exist already.
      *
-     * @param path
-     *      the file's absolute path.
+     * @param  path
+     *         the file's absolute path.
      *
      * @return the {@link Path} of the created file. Essentially the input parameter.
      *
@@ -43,6 +43,15 @@ public final class FileUtils {
      */
     public static Path createIfNotExists(final Path path) throws IOException {
         if (Files.notExists(path)) {
+            try {
+                final Path directory = path.getParent();
+                if (directory != null) {
+                    Files.createDirectories(directory);
+                }
+            } catch (final IOException e) {
+                LOG.debug("Directory already exists, no need to create.", e);
+            }
+
             return Files.createFile(path);
         }
 

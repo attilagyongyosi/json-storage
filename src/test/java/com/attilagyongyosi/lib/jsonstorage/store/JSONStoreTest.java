@@ -19,6 +19,7 @@ import java.util.Collection;
 public class JSONStoreTest {
     private static final String LOCAL_DB_NAME = "local-db.db";
     private static final String LOCAL_DB_OUTSIDE_PROJECT_NAME = "../local-db-outside.db";
+    private static final String LOCAL_DB_OUTSIDE_PROJECT_NAME2 = "../test/local-db-outside.db";
     private static final String EXISTING_DB_NAME = "db/test/valid-db.db";
 
     private FileLock lock;
@@ -35,6 +36,11 @@ public class JSONStoreTest {
     @Test
     public void canCreateStoreAnywhere() throws Exception {
         createStoreAndCheck(LOCAL_DB_OUTSIDE_PROJECT_NAME);
+    }
+
+    @Test
+    public void canCreateStoreWithinNewDirectory() throws Exception {
+        createStoreAndCheck(LOCAL_DB_OUTSIDE_PROJECT_NAME2);
     }
 
     @Test(expected = StoreCreationException.class)
