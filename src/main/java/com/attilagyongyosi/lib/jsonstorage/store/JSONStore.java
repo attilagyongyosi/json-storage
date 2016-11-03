@@ -27,13 +27,12 @@ import java.util.Map;
  * {@link JSONStore} is an easy way to persist a collection of objects
  * in a JSON file.
  *
- * JSONStore is essentially a {@link Map} instance which automatically gets
- * synchronized with a backing JSON file.
+ * <p>JSONStore is essentially a {@link Map} instance which automatically gets
+ * synchronized with a backing JSON file.</p>
  *
- * @param <T>
- *     Type of the objects you want to store in the backing JSON file.
+ * @param <T> Type of the objects you want to store in the backing JSON file.
  *
- * @author attilagyongyosi
+ * @author    attilagyongyosi
  */
 public class JSONStore<T> {
     private static final Logger LOG = LoggerFactory.getLogger(JSONStore.class);
@@ -71,13 +70,13 @@ public class JSONStore<T> {
      *
      * Then the file's contents will be read and deserialized into the backing {@link Map} instance.
      *
-     * @param type
-     *      the type of objects this JSON store will contain.
+     * @param  type
+     *         the type of objects this JSON store will contain.
      *
      * @return itself
      *
      * @throws StoreCreationException
-     *      when there is an issue during the creation and initialization of the store
+     *         when there is an issue during the creation and initialization of the store
      */
     public JSONStore<T> create(final Class<T> type) throws StoreCreationException {
         LOG.debug("Creating JSON store in file {}...", this.filePath);
@@ -90,16 +89,16 @@ public class JSONStore<T> {
     /**
      * Stores an object in the JSON store.
      *
-     * @param key
-     *      the String key where the object should be stored.
+     * @param  key
+     *         the String key where the object should be stored.
      *
-     * @param object
-     *      the object itself to store as JSON.
+     * @param  object
+     *         the object itself to store as JSON.
      *
      * @return the stored object if operation was successful
      *
      * @throws StorageException
-     *      when an error occurs during the storage operation
+     *         when an error occurs during the storage operation
      */
     public T store(final String key, final T object) throws StorageException {
         LOG.debug("Storing {} as key {}...", object, key);
@@ -132,8 +131,8 @@ public class JSONStore<T> {
      * This is to avoid unnecessary file read operations as the Map should
      * always be in sync with the backing file.
      *
-     * @param key
-     *      the key to retrieve the stored object from
+     * @param  key
+     *         the key to retrieve the stored object from
      *
      * @return the object contained at the supplied key or {@code null}.
      */
@@ -145,9 +144,11 @@ public class JSONStore<T> {
      * Clears both the underlying {@link Map} instance and the backing
      * JSON file.
      *
-     * @return {@code true} if the operation was successful, {@code false} otherwise.
+     * @return {@code true}
+     *         if the operation was successful, {@code false} otherwise.
      *
-     * @throws StorageException when operation fails
+     * @throws StorageException
+     *         when operation fails
      */
     public boolean clear() throws StorageException {
         LOG.debug("Clearing JSON storage at {}...", this.filePath);
