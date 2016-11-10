@@ -140,6 +140,17 @@ public class JSONStore<T> {
         return this.data.get(key);
     }
 
+    /**
+     * Removes a particular entry from the store.
+     *
+     * @param   key
+     *          the key of the object to remove from the store
+     *
+     * @return  the removed item
+     *
+     * @throws  StorageException
+     *          when store synchronization fails
+     */
     public T remove(final String key) throws StorageException {
         final T removed = this.data.remove(key);
         this.sync();
