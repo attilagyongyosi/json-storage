@@ -140,6 +140,12 @@ public class JSONStore<T> {
         return this.data.get(key);
     }
 
+    public T remove(final String key) throws StorageException {
+        final T removed = this.data.remove(key);
+        this.sync();
+        return removed;
+    }
+
     /**
      * Clears both the underlying {@link Map} instance and the backing
      * JSON file.
