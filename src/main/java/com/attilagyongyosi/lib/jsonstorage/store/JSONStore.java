@@ -123,6 +123,16 @@ public class JSONStore<T> {
     }
 
     /**
+     * Returns with the size of the current storage.
+     * Size means the number of elements currently stored.
+     *
+     * @return  the number of elements in the store
+     */
+    public long size() {
+        return this.data.size();
+    }
+
+    /**
      * Returns a single object from the store, specified by the supplied key.
      *
      * This method will not actually fetch data from the backing JSON file,
@@ -146,7 +156,7 @@ public class JSONStore<T> {
      * @param   key
      *          the key of the object to remove from the store
      *
-     * @return  the removed item
+     * @return  the removed item or null if the item is not in the store
      *
      * @throws  StorageException
      *          when store synchronization fails

@@ -76,6 +76,13 @@ public class JSONStoreTest {
     }
 
     @Test
+    public void canRemove() throws Exception {
+        final TestModel actual = store.remove("test1");
+        Assert.assertEquals(TestData.MODEL1, actual);
+        Assert.assertEquals(1L, store.size());
+    }
+
+    @Test
     public void canOpenExistingDB() throws Exception {
         final TestModel expected = TestModel.builder()
             .id(1)
